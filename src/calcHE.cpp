@@ -55,7 +55,7 @@
 
 
 void  TestIt(long R, long p, long r, long d, long c, long k, long w, 
-               long L, long m, const Vec<long>& gens, const Vec<long>& ords)
+               long L, long m, const Vec<long>& gens, const Vec<long>& ords, const Vec<long>& operand1, const Vec<long>& operand2)
 {
   char buffer[32];
   cerr << "\n\n******** TestIt: R=" << R 
@@ -117,11 +117,15 @@ void  TestIt(long R, long p, long r, long d, long c, long k, long w,
   PlaintextArray p1(ea);
   PlaintextArray p2(ea);
   PlaintextArray p3(ea);
+  PlaintextArray operandP1(ea);
+  PlaintextArray operandP2(ea);
 
   p0.random();
   p1.random();
   p2.random();
   p3.random();
+  
+  operandP1.setData(operand1);
 
   Ctxt c0(publicKey), c1(publicKey), c2(publicKey), c3(publicKey);
   ea.encrypt(c0, publicKey, p0);
@@ -324,7 +328,15 @@ int main(int argc, char **argv)
   Vec<long> ords;
   amap.arg("ords", ords, "use specified vector of orders", NULL);
   amap.note("e.g., ords='[4 2 -4]', negative means 'bad'");
-
+  
+  Vec<long> operand1;
+  amap.arg("operand1", operand1, "use specified vector of orders", NULL);
+  amap.note("e.g., operand1='[1 0 1]', negative means 'bad'");
+  
+  Vec<long> operand2;
+  amap.arg("operand2", operand2, "use specified vector of orders", NULL);
+  amap.note("e.g., operand2='[1 0 1]', negative means 'bad'");
+  
   amap.parse(argc, argv);
   
   if (L==0) { // determine L based on R,r
@@ -343,7 +355,7 @@ int main(int argc, char **argv)
   long m = FindM(k, L, c, p, d, s, chosen_m, true);
 
   for (long repeat_cnt = 0; repeat_cnt < repeat; repeat_cnt++) {
-    TestIt(R, p, r, d, c, k, w, L, m, gens, ords);
+    TestIt(R, p, r, d, c, k, w, L, m, gens, ords, operand1, operand2);
   }
 }
 

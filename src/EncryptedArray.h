@@ -906,6 +906,7 @@ public:
 
   // output
   virtual void print(ostream& s) const = 0;
+  virtual void setData(const Vec<long>& _data) = 0;
 };
 
 
@@ -1275,18 +1276,26 @@ public:
       s << "]";
     }
   }
+  
+  virtual void setData(const Vec<RX>& _data) 
+  {
+    //assert(lsize(_data) == n);
+    //data = _data;
+    cout << "<<<<<<<<<<<<<<<<,,setData>>>>>>>>>>>>>>." << endl;
+  }
 
 
 
   /* The follwing two methods assume that the modulus context is already set */
 
   const vector<RX>& getData() const { return data; }
-
+    /*
   void setData(const vector<RX>& _data) 
   {
     assert(lsize(_data) == n);
     data = _data;
   }
+  */
 
 
 };
@@ -1375,6 +1384,7 @@ public:
   virtual void applyPerm(const Vec<long>& pi) { rep->applyPerm(pi); }
 
   void print(ostream& s) const { rep->print(s); }
+  void setData(const Vec<long>& _data) { rep->setData(_data); }
 };
 
 
