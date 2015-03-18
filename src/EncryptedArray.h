@@ -1276,26 +1276,21 @@ public:
       s << "]";
     }
   }
-  
-  virtual void setData(const Vec<RX>& _data) 
+
+  virtual void setData(const Vec<long>& _data) 
   {
-    //assert(lsize(_data) == n);
-    //data = _data;
-    cout << "<<<<<<<<<<<<<<<<,,setData>>>>>>>>>>>>>>." << endl;
+      
   }
-
-
 
   /* The follwing two methods assume that the modulus context is already set */
 
   const vector<RX>& getData() const { return data; }
-    /*
+
   void setData(const vector<RX>& _data) 
   {
     assert(lsize(_data) == n);
     data = _data;
   }
-  */
 
 
 };
