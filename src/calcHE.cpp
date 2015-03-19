@@ -24,6 +24,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <vector>
 
 #ifdef DEBUG
 #define debugCompare(ea,sk,p,c) {\
@@ -53,7 +54,6 @@
 
 **************/
 
-
 void  TestIt(long R, long p, long r, long d, long c, long k, long w, 
                long L, long m, const Vec<long>& gens, const Vec<long>& ords, const Vec<long>& operand1, const Vec<long>& operand2)
 {
@@ -69,11 +69,15 @@ void  TestIt(long R, long p, long r, long d, long c, long k, long w,
        << ", m=" << m
        << ", gens=" << gens
        << ", ords=" << ords
+       << ", operand1=" << operand1
+       << ", operand2=" << operand2
        << endl;
 
-  vector<long> gens1, ords1;
+  vector<long> gens1, ords1, operand1Vector, operand2Vector;
   convert(gens1, gens);
   convert(ords1, ords);
+  convert(operand1Vector, operand1);
+  convert(operand2Vector, operand2);
 
   FHEcontext context(m, p, r, gens1, ords1);
   buildModChain(context, L, c);
@@ -112,6 +116,13 @@ void  TestIt(long R, long p, long r, long d, long c, long k, long w,
 
 
   long nslots = ea.size();
+  int tmpSize = operand1Vector.size();
+  for(int i=nslots-1; i>=tmpSize; i--) {
+      operand1Vector.insert(operand1Vector.begin(), 0);
+  }
+  cout << "operand1Vector size = " << operand1Vector.size() << endl;
+  
+  //ZZX testZZX = 10;
 
   PlaintextArray p0(ea);
   PlaintextArray p1(ea);
@@ -125,7 +136,8 @@ void  TestIt(long R, long p, long r, long d, long c, long k, long w,
   p2.random();
   p3.random();
   
-  operandP1.setData(operand1);
+  operandP1.encode(operand1Vector);
+  operandP1.print(cout);
 
   Ctxt c0(publicKey), c1(publicKey), c2(publicKey), c3(publicKey);
   ea.encrypt(c0, publicKey, p0);
