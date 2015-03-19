@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
   // first loop: generate stuff and write it to cout
 
-  // open file for writing
+  // open file for writing 
   {fstream keyFile("iotest.txt", fstream::out|fstream::trunc);
    assert(keyFile.is_open());
   for (long i=0; i<N_TESTS; i++) {
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 
     cerr << "test "<<i<<" okay\n\n";
   }}
-  unlink("iotest.txt"); // clean up before exiting
+  //unlink("iotest.txt"); // clean up before exiting
 }
 
 #if 0

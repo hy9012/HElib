@@ -138,6 +138,8 @@ void  TestIt(long R, long p, long r, long d, long c, long k, long w,
   
   operandP1.encode(operand1Vector);
   operandP1.print(cout);
+  operandP2.encode(operand2Vector);
+  operandP2.print(cout);
 
   Ctxt c0(publicKey), c1(publicKey), c2(publicKey), c3(publicKey);
   ea.encrypt(c0, publicKey, p0);
