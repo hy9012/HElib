@@ -27,6 +27,7 @@
 #include "EncryptedArray.h"
 
 #define N_TESTS 3
+
 static long ms[N_TESTS][4] = {
   //nSlots  m   phi(m) ord(2)
   {   2,    7,    6,    3},
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
   Ctxt*       ctxts[N_TESTS];
   EncryptedArray* eas[N_TESTS];
   vector<ZZX> ptxts[N_TESTS];  
+  
   fstream keyFile("iotest.txt", fstream::in);
   for (long i=0; i<N_TESTS; i++) {
 
@@ -71,46 +73,46 @@ int main(int argc, char *argv[])
     readContextBase(keyFile, m1, p1, r1);
     FHEcontext tmpContext(m1, p1, r1);
     keyFile >> tmpContext;
-    //assert (*contexts[i] == tmpContext);
-    //cerr << i << ": context matches input\n";
-
+//     assert (*contexts[i] == tmpContext);
+//     cerr << i << ": context matches input\n";
+// 
     // We define some things below wrt *contexts[i], not tmpContext.
     // This is because the various operator== methods check equality of
     // references, not equality of the referenced FHEcontext objects.
-     //FHEcontext& context;
-     FHESecKey secretKey;
-     FHESecKey secretKey2(tmpContext);
-//     const FHEPubKey& publicKey = secretKey;
-     const FHEPubKey& publicKey2 = secretKey2;
+    //FHEcontext& context = *contexts[i];
+    FHESecKey secretKey(tmpContext);
+    FHESecKey secretKey2(tmpContext);
+    const FHEPubKey& publicKey = secretKey;
+    const FHEPubKey& publicKey2 = secretKey2;
+
+    keyFile >> secretKey;
+    keyFile >> secretKey2;
+    //assert(secretKey == *sKeys[i]);
+    cerr << "   secret key matches input\n";
 // 
-     keyFile >> secretKey;
-     keyFile >> secretKey2;
-//     assert(secretKey == *sKeys[i]);
-//     cerr << "   secret key matches input\n";
+//     EncryptedArray ea(tmpContext);
+//     EncryptedArray ea2(tmpContext);
 // 
-//     EncryptedArray ea(context);
-     EncryptedArray ea2(tmpContext);
+//     long nslots = ea.size();
 // 
-     long nslots = ea2.size();
-// 
-     // Read the plaintext from file
-     vector<ZZX> a;
-     a.resize(nslots);
-     //assert(nslots == (long)ptxts[i].size());
-     seekPastChar(keyFile, '['); // defined in NumbTh.cpp
-     for (long j = 0; j < nslots; j++) {
-       keyFile >> a[j];
-       //assert(a[j] == ptxts[i][j]);
-     }
-    seekPastChar(keyFile, ']');
-    cerr << "   ptxt matches input\n";
-// 
+//     // Read the plaintext from file
+//     vector<ZZX> a;
+//     a.resize(nslots);
+//     //assert(nslots == (long)ptxts[i].size());
+//     seekPastChar(keyFile, '['); // defined in NumbTh.cpp
+//     for (long j = 0; j < nslots; j++) {
+//       keyFile >> a[j];
+// //       assert(a[j] == ptxts[i][j]);
+//     }
+//     seekPastChar(keyFile, ']');
+//     cerr << "   ptxt matches input\n";
+
 //     // Read the encoded plaintext from file
-    ZZX poly1, poly2;
-    keyFile >> poly1;
-    eas[i]->encode(poly2,a);
-    assert(poly1 == poly2);
-    cerr << "   eas[i].encode(a)==poly1 okay\n";
+//     ZZX poly1, poly2;
+//     keyFile >> poly1;
+//     eas[i]->encode(poly2,a);
+//     assert(poly1 == poly2);
+//     cerr << "   eas[i].encode(a)==poly1 okay\n";
 // 
 //     ea.encode(poly2,a);
 //     assert(poly1 == poly2);

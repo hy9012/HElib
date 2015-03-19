@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
   // open file for writing 
   fstream keyFile("iotest.txt", fstream::out|fstream::trunc);
-  assert(keyFile.is_open());
+   assert(keyFile.is_open());
   for (long i=0; i<N_TESTS; i++) {
     long m = ms[i][1];
 
@@ -93,30 +93,30 @@ int main(int argc, char *argv[])
     // of most things.
     keyFile << *sKeys[i] << endl;;
     keyFile << *sKeys[i] << endl;;
-
-    vector<ZZX> b;
-    long p2r = eas[i]->getContext().alMod.getPPowR();
-    ZZX poly = RandPoly(0,to_ZZ(p2r)); // choose a random constant polynomial
-    eas[i]->decode(ptxts[i], poly);
-
-    ctxts[i] = new Ctxt(publicKey);
-    eas[i]->encrypt(*ctxts[i], publicKey, ptxts[i]);
-    eas[i]->decrypt(*ctxts[i], *sKeys[i], b);
-    assert(ptxts[i].size() == b.size());
-    for (long j = 0; j < nslots; j++) assert (ptxts[i][j] == b[j]);
-
-    // output the plaintext
-    keyFile << "[ ";
-    for (long j = 0; j < nslots; j++) keyFile << ptxts[i][j] << " ";
-    keyFile << "]\n";
-
-    eas[i]->encode(poly,ptxts[i]);
-    keyFile << poly << endl;
-
-    // Output the ciphertext to file
-    keyFile << *ctxts[i] << endl;
-    keyFile << *ctxts[i] << endl;
-    cerr << "okay " << i << endl;
+// 
+//     vector<ZZX> b;
+//     long p2r = eas[i]->getContext().alMod.getPPowR();
+//     ZZX poly = RandPoly(0,to_ZZ(p2r)); // choose a random constant polynomial
+//     eas[i]->decode(ptxts[i], poly);
+// 
+//     ctxts[i] = new Ctxt(publicKey);
+//     eas[i]->encrypt(*ctxts[i], publicKey, ptxts[i]);
+//     eas[i]->decrypt(*ctxts[i], *sKeys[i], b);
+//     assert(ptxts[i].size() == b.size());
+//     for (long j = 0; j < nslots; j++) assert (ptxts[i][j] == b[j]);
+// 
+//     // output the plaintext
+//     keyFile << "[ ";
+//     for (long j = 0; j < nslots; j++) keyFile << ptxts[i][j] << " ";
+//     keyFile << "]\n";
+// 
+//     eas[i]->encode(poly,ptxts[i]);
+//     keyFile << poly << endl;
+// 
+//     // Output the ciphertext to file
+//     keyFile << *ctxts[i] << endl;
+//     keyFile << *ctxts[i] << endl;
+//     cerr << "okay " << i << endl;
   }
   keyFile.close();
   cerr << "so far, so good\n";
