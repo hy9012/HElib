@@ -58,66 +58,67 @@ int main(int argc, char *argv[])
 
   long ptxtSpace = power_long(p,r);
 
-  FHEcontext* contexts[N_TESTS];
-  FHESecKey*  sKeys[N_TESTS];
-  Ctxt*       ctxts[N_TESTS];
-  EncryptedArray* eas[N_TESTS];
-  vector<ZZX> ptxts[N_TESTS];
+  FHEcontext* contexts;
+  FHESecKey*  sKeys;
+  Ctxt*       ctxts;
+  EncryptedArray* eas;
+  vector<ZZX> ptxts;
+
 
   // first loop: generate stuff and write it to cout
 
   // open file for writing 
   fstream keyFile("iotest.txt", fstream::out|fstream::trunc);
    assert(keyFile.is_open());
-  for (long i=0; i<N_TESTS; i++) {
-    long m = ms[i][1];
+    long m = ms[2][1];
 
     cout << "Testing IO: m="<<m<<", p^r="<<p<<"^"<<r<<endl;
 
-    contexts[i] = new FHEcontext(m, p, r);
-    buildModChain(*contexts[i], ptxtSpace, c);  // Set the modulus chain
+    contexts = new FHEcontext(m, p, r);
+    buildModChain(*contexts, ptxtSpace, c);  // Set the modulus chain
 
     // Output the FHEcontext to file
-    writeContextBase(keyFile, *contexts[i]);
-    keyFile << *contexts[i] << endl;
+    writeContextBase(keyFile, *contexts);
+    keyFile << *contexts << endl;
 
-    sKeys[i] = new FHESecKey(*contexts[i]);
-    const FHEPubKey& publicKey = *sKeys[i];
-    sKeys[i]->GenSecKey(w,ptxtSpace); // A Hamming-weight-w secret key
-    addSome1DMatrices(*sKeys[i]);// compute key-switching matrices that we need
-    eas[i] = new EncryptedArray(*contexts[i]);
+    sKeys = new FHESecKey(*contexts);
+    const FHEPubKey& publicKey = *sKeys;
+    sKeys->GenSecKey(w,ptxtSpace); // A Hamming-weight-w secret key
+    addSome1DMatrices(*sKeys);// compute key-switching matrices that we need
+    eas = new EncryptedArray(*contexts);
 
-    long nslots = eas[i]->size();
+    long nslots = eas->size();
+    PlaintextArray randomPta(*eas);
+    randomPta.random();
+    randomPta.print(cout);
 
     // Output the secret key to file, twice. Below we will have two copies
     // of most things.
-    keyFile << *sKeys[i] << endl;;
-    keyFile << *sKeys[i] << endl;;
-// 
-//     vector<ZZX> b;
-//     long p2r = eas[i]->getContext().alMod.getPPowR();
-//     ZZX poly = RandPoly(0,to_ZZ(p2r)); // choose a random constant polynomial
-//     eas[i]->decode(ptxts[i], poly);
-// 
-//     ctxts[i] = new Ctxt(publicKey);
-//     eas[i]->encrypt(*ctxts[i], publicKey, ptxts[i]);
-//     eas[i]->decrypt(*ctxts[i], *sKeys[i], b);
-//     assert(ptxts[i].size() == b.size());
-//     for (long j = 0; j < nslots; j++) assert (ptxts[i][j] == b[j]);
-// 
-//     // output the plaintext
-//     keyFile << "[ ";
-//     for (long j = 0; j < nslots; j++) keyFile << ptxts[i][j] << " ";
-//     keyFile << "]\n";
-// 
-//     eas[i]->encode(poly,ptxts[i]);
-//     keyFile << poly << endl;
-// 
-//     // Output the ciphertext to file
-//     keyFile << *ctxts[i] << endl;
-//     keyFile << *ctxts[i] << endl;
-//     cerr << "okay " << i << endl;
-  }
+    keyFile << *sKeys << endl;;
+
+    vector<ZZX> b;
+    long p2r = eas->getContext().alMod.getPPowR();
+    ZZX poly = RandPoly(0,to_ZZ(p2r)); // choose a random constant polynomial
+    eas->encode(poly, randomPta);
+    eas->decode(ptxts, poly);
+
+    ctxts = new Ctxt(publicKey);
+    eas->encrypt(*ctxts, publicKey, ptxts);
+    eas->decrypt(*ctxts, *sKeys, b);
+    assert(ptxts.size() == b.size());
+    for (long j = 0; j < nslots; j++) assert (ptxts[j] == b[j]);
+
+    // output the plaintext
+    keyFile << "[ ";
+    for (long j = 0; j < nslots; j++) keyFile << ptxts[j] << " ";
+    keyFile << "]\n";
+
+    eas->encode(poly,ptxts);
+    keyFile << poly << endl;
+
+    // Output the ciphertext to file
+    keyFile << *ctxts << endl;
+    cerr << "okay"<< endl;
   keyFile.close();
   cerr << "so far, so good\n";
 }

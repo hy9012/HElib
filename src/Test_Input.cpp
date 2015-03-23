@@ -1,3 +1,4 @@
+
 /* Copyright (C) 2012,2013 IBM Corp.
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,14 +60,13 @@ int main(int argc, char *argv[])
 
   long ptxtSpace = power_long(p,r);
 
-  FHEcontext* contexts[N_TESTS];
+  FHEcontext* contexts;
   FHESecKey*  sKeys[N_TESTS];
   Ctxt*       ctxts[N_TESTS];
   EncryptedArray* eas[N_TESTS];
   vector<ZZX> ptxts[N_TESTS];  
   
   fstream keyFile("iotest.txt", fstream::in);
-  for (long i=0; i<N_TESTS; i++) {
 
     // Read context from file
     unsigned long m1, p1, r1;
@@ -81,42 +81,35 @@ int main(int argc, char *argv[])
     // references, not equality of the referenced FHEcontext objects.
     //FHEcontext& context = *contexts[i];
     FHESecKey secretKey(tmpContext);
-    FHESecKey secretKey2(tmpContext);
     const FHEPubKey& publicKey = secretKey;
-    const FHEPubKey& publicKey2 = secretKey2;
 
     keyFile >> secretKey;
-    keyFile >> secretKey2;
     //assert(secretKey == *sKeys[i]);
     cerr << "   secret key matches input\n";
-// 
-//     EncryptedArray ea(tmpContext);
-//     EncryptedArray ea2(tmpContext);
-// 
-//     long nslots = ea.size();
-// 
-//     // Read the plaintext from file
-//     vector<ZZX> a;
-//     a.resize(nslots);
-//     //assert(nslots == (long)ptxts[i].size());
-//     seekPastChar(keyFile, '['); // defined in NumbTh.cpp
-//     for (long j = 0; j < nslots; j++) {
-//       keyFile >> a[j];
-// //       assert(a[j] == ptxts[i][j]);
-//     }
-//     seekPastChar(keyFile, ']');
-//     cerr << "   ptxt matches input\n";
+
+    EncryptedArray ea(tmpContext);
+
+    long nslots = ea.size();
+
+    // Read the plaintext from file
+    vector<ZZX> a;
+    a.resize(nslots);
+    //assert(nslots == (long)ptxts[i].size());
+    seekPastChar(keyFile, '['); // defined in NumbTh.cpp
+    for (long j = 0; j < nslots; j++) {
+      keyFile >> a[j];
+//       assert(a[j] == ptxts[i][j]);
+    }
+    seekPastChar(keyFile, ']');
+    cerr << "   ptxt matches input\n";
 
 //     // Read the encoded plaintext from file
-//     ZZX poly1, poly2;
-//     keyFile >> poly1;
-//     eas[i]->encode(poly2,a);
-//     assert(poly1 == poly2);
-//     cerr << "   eas[i].encode(a)==poly1 okay\n";
+    ZZX poly1, poly2;
+    keyFile >> poly1;
 // 
-//     ea.encode(poly2,a);
-//     assert(poly1 == poly2);
-//     cerr << "   ea.encode(a)==poly1 okay\n";
+    ea.encode(poly2,a);
+    assert(poly1 == poly2);
+    cerr << "   ea.encode(a)==poly1 okay\n";
 // 
 //     ea2.encode(poly2,a);
 //     assert(poly1 == poly2);
@@ -138,45 +131,19 @@ int main(int argc, char *argv[])
 //     cerr << "   ea2.decode(poly1)==ptxts[i] okay\n";
 // 
 //     // Read ciperhtext from file
-//     Ctxt ctxt(publicKey);
-//     Ctxt ctxt2(publicKey2);
-//     keyFile >> ctxt;
-//     keyFile >> ctxt2;
-//     assert(ctxts[i]->equalsTo(ctxt,/*comparePkeys=*/false));
-//     cerr << "   ctxt matches input\n";
-// 
-//     sKeys[i]->Decrypt(poly2,*ctxts[i]);
-//     assert(poly1 == poly2);
-//     cerr << "   sKeys[i]->decrypt(*ctxts[i]) == poly1 okay\n";
-// 
-//     secretKey.Decrypt(poly2,*ctxts[i]);
-//     assert(poly1 == poly2);
-//     cerr << "   secretKey.decrypt(*ctxts[i]) == poly1 okay\n";
-// 
-//     secretKey.Decrypt(poly2,ctxt);
-//     assert(poly1 == poly2);
-//     cerr << "   secretKey.decrypt(ctxt) == poly1 okay\n";
-// 
-//     secretKey2.Decrypt(poly2,ctxt2);
-//     assert(poly1 == poly2);
-//     cerr << "   secretKey2.decrypt(ctxt2) == poly1 okay\n";
-// 
-//     eas[i]->decrypt(ctxt, *sKeys[i], a);
-//     assert(nslots == (long)a.size());
-//     for (long j = 0; j < nslots; j++) assert(a[j] == ptxts[i][j]);
-//     cerr << "   eas[i].decrypt(ctxt, *sKeys[i])==ptxts[i] okay\n";
-// 
-//     ea.decrypt(ctxt, secretKey, a);
-//     assert(nslots == (long)a.size());
-//     for (long j = 0; j < nslots; j++) assert(a[j] == ptxts[i][j]);
-//     cerr << "   ea.decrypt(ctxt, secretKey)==ptxts[i] okay\n";
-// 
+     Ctxt ctxt(publicKey);
+     keyFile >> ctxt;
+     
+     
+     PlaintextArray pta(ea);
+     ea.decrypt(ctxt, secretKey, pta);
+     pta.print(cout);
 //     ea2.decrypt(ctxt2, secretKey2, a);
 //     assert(nslots == (long)a.size());
 //     for (long j = 0; j < nslots; j++) assert(a[j] == ptxts[i][j]);
 //     cerr << "   ea2.decrypt(ctxt2, secretKey2)==ptxts[i] okay\n";
-// 
-//     cerr << "test "<<i<<" okay\n\n";
-  }
+     
+     
+     cerr << "test okay\n\n";
   //unlink("iotest.txt"); // clean up before exiting
 }
